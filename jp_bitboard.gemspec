@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["zosulab@gmail.com"]
 
   if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com' to prevent pushes to rubygems.org, or delete to allow pushes to any server."
+    spec.metadata['allowed_push_host'] = "http://mygemserver.com"
   end
 
   spec.summary       = %q{Bitcoinの国内取引所のAPIラッパー}
