@@ -1,7 +1,5 @@
 require "jp_bitboard/version"
+require "jp_bitboard/api"
 
 module JpBitboard
-  def self.greet
-    p "we are bitcoin!"
-  end
 end
