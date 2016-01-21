@@ -3,6 +3,8 @@ module JpBitboard
   require 'net/http'
   require 'uri'
   require 'json'
+  require 'openssl'
+  require 'open-uri'
 
   class Client
      def initialize(options = {})
@@ -40,7 +42,7 @@ module JpBitboard
      end
 
      def update_zaif
-        data = get_json('https://api.zaif.jp/api/1/ticker/btc_jpy')
+        data = get_json('http://api.zaif.jp/api/1/ticker/btc_jpy')
         return {bid: data["bid"], ask: data["ask"], last_price: data["last"]}
      end
 
