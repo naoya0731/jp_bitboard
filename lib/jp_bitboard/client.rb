@@ -21,7 +21,7 @@ module JpBitboard
 
      def update
         @data["bitflyer"] = update_bitflyer
-        @data["zaif"] = update_coincheck
+        @data["zaif"] = update_zaif
         @data["coincheck"] = update_coincheck
         @data["btcbox"] = update_btcbox
         @data["quoine"] = update_quoine
