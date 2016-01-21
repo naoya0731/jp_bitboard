@@ -3,7 +3,6 @@ module JpBitboard
   require 'net/http'
   require 'uri'
   require 'json'
-  require 'openssl'
 
   class Client
      def initialize(options = {})
@@ -32,7 +31,6 @@ module JpBitboard
      def get_json(url)
       uri = URI.parse(url)
       json = Net::HTTP.get(uri)
-      OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
       return JSON.parse(json)
      end
 
