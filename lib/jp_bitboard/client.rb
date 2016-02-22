@@ -27,6 +27,8 @@ module JpBitboard
         @data["coincheck"] = update_coincheck
         @data["btcbox"] = update_btcbox
         @data["quoine"] = update_quoine
+        @data["okcoin_usd"] = update_okcoin_usd
+        @data["okcoin_cny"] = update_okcoin_cny
         @updated_at = Time.now
      end
 
@@ -59,6 +61,16 @@ module JpBitboard
      def update_quoine
         data = get_json('https://api.quoine.com/products')
         return {bid: data[2]["market_bid"], ask: data[2]["market_ask"], last_price: data[2]["last_traded_price"], volume: data[2]["volume_24h"].to_i}
+     end
+
+     def update_okcoin_usd
+        data = get_json('https://www.okcoin.com/api/v1/ticker.do?symbol=btc_usd')
+        return {bid: data["ticker"]["buy"], ask: data["ticker"]["sell"], last_price: data["ticker"]["last"], volume: data["ticker"]["vol"]}
+     end
+
+     def update_okcoin_cny
+        data = get_json('https://www.okcoin.cn/api/v1/ticker.do?symbol=btc_cny')
+        return {bid: data["ticker"]["buy"].to_i, ask: data["ticker"]["sell"].to_i, last_price: data["ticker"]["last"].to_i, volume: data["ticker"]["vol"].to_i}
      end
   end
 end
