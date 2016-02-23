@@ -65,7 +65,7 @@ module JpBitboard
 
      def update_okcoin_usd
         data = get_json('https://www.okcoin.com/api/v1/ticker.do?symbol=btc_usd')
-        return {bid: data["ticker"]["buy"], ask: data["ticker"]["sell"], last_price: data["ticker"]["last"], volume: data["ticker"]["vol"]}
+        return {bid: data["ticker"]["buy"].to_i, ask: data["ticker"]["sell"].to_i, last_price: data["ticker"]["last"].to_i, volume: data["ticker"]["vol"].to_i}
      end
 
      def update_okcoin_cny
