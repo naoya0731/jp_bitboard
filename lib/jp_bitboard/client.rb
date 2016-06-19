@@ -40,7 +40,7 @@ module JpBitboard
 
      def update_bitflyer
         data = get_json('https://api.bitflyer.jp/v1/ticker')
-        return {bid: data["best_bid"], ask: data["best_ask"], last_price: data["ltp"], volume: data["volume_by_product"].to_i}
+        return {bid: data["best_bid"], ask: data["best_ask"], last_price: data["ltp"], volume: data["volume"].to_i}
      end
 
      def update_zaif
