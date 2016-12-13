@@ -6,71 +6,75 @@ module JpBitboard
   require 'openssl'
   require 'open-uri'
 
-  class Client
-     def initialize(options = {})
-        @data = Hash.new
+  class Bitboard
+     attr_accessor :data, :updated_at, :markets
+     def initialize()
         @updated_at = Time.now
-        update
+        @markets = [Market.new("bitFlyer", "https://api.bitflyer.jp/v1/ticker", "JPY"),
+                    Market.new("Zaif", "http://api.zaif.jp/api/1/ticker/btc_jpy", "JPY"),
+                    Market.new("Coincheck", "https://coincheck.jp/api/ticker", "JPY"),
+                    Market.new("BtcBox", "https://www.btcbox.co.jp/api/v1/ticker/", "JPY"),
+                    Market.new("Quoine", "https://api.quoine.com/products", "JPY"),
+                    Market.new("OKCoin(USD)", "https://www.okcoin.com/api/v1/ticker.do?symbol=btc_usd", "USD"),
+                    Market.new("OKCoin(CNY)", "https://www.okcoin.com/api/v1/ticker.do?symbol=btc_cny", "CNY")
+                    ]
+        #データのfetch
+        @markets.each_with_index do |market,i|
+            market.fetch
+        end
      end
+  end
 
-     def data
-        @data
-     end
+  class Market
+    attr_accessor :name, :url, :data, :currency
 
-     def updated_at
-        @updated_at
-     end
+    def initialize(name,url,currency)
+        @name = name
+        @url = url
+        @currency = currency
+        @data = {bid: "N/A", ask: "N/A", last_price: "N/A", volume: "N/A"}
+    end
 
-     def update
-        @data["bitflyer"] = update_bitflyer
-        @data["zaif"] = update_zaif
-        @data["coincheck"] = update_coincheck
-        @data["btcbox"] = update_btcbox
-        @data["quoine"] = update_quoine
-        @data["okcoin_usd"] = update_okcoin_usd
-        @data["okcoin_cny"] = update_okcoin_cny
-        @updated_at = Time.now
-     end
+    def fetch
+        begin
+           uri = URI.parse(@url)
+           response = Net::HTTP.get_response(uri)
 
-     def get_json(url)
-      uri = URI.parse(url)
-      json = Net::HTTP.get(uri)
-      return JSON.parse(json)
-     end
+           if response.code == "200"
+                @data = parse_data(JSON.parse(response.body))
+           end
+        rescue Exception => e
+           @data = {bid: "N/A", ask: "N/A", last_price: "N/A", volume: "N/A"} 
+        end
+    end
 
-     def update_bitflyer
-        data = get_json('https://api.bitflyer.jp/v1/ticker')
-        return {bid: data["best_bid"], ask: data["best_ask"], last_price: data["ltp"], volume: data["volume"].to_i}
-     end
+    def parse_data(json)
+        if json.nil?
+            {bid: "N/A", ask: "N/A", last_price: "N/A", volume: "N/A"}
+        else
+            case @name 
+            when "bitFlyer"
+                tmp = {bid: json["best_bid"], ask: json["best_ask"], last_price: json["ltp"], volume: json["volume"]}
+            when "Zaif"
+                tmp = {bid: json["bid"], ask: json["ask"], last_price: json["last"], volume: json["volume"]}
+            when "Coincheck"
+                tmp = {bid: json["bid"], ask: json["ask"], last_price: json["last"], volume: json["volume"]}
+            when "BtcBox"
+                tmp = {bid: json["buy"], ask: json["sell"], last_price: json["last"], volume: json["vol"]}
+            when "Quoine"
+                tmp = {bid: json[2]["market_bid"], ask: json[2]["market_ask"], last_price: json[2]["last_traded_price"], volume: json[2]["volume_24h"]}
+            when "OKCoin(USD)"
+                tmp = {bid: json["ticker"]["buy"], ask: json["ticker"]["sell"], last_price: json["ticker"]["last"], volume: json["ticker"]["vol"]}
+            when "OKCoin(CNY)"
+                tmp = {bid: json["ticker"]["buy"], ask: json["ticker"]["sell"], last_price: json["ticker"]["last"], volume: json["ticker"]["vol"]}
+            end
 
-     def update_zaif
-        data = get_json('http://api.zaif.jp/api/1/ticker/btc_jpy')
-        return {bid: data["bid"], ask: data["ask"], last_price: data["last"], volume: data["volume"].to_i}
-     end
-
-     def update_coincheck
-        data = get_json('https://coincheck.jp/api/ticker')
-        return {bid: data["bid"], ask: data["ask"], last_price: data["last"], volume: data["volume"].to_i}
-     end
-
-     def update_btcbox
-        data = get_json('https://www.btcbox.co.jp/api/v1/ticker/')
-        return {bid: data["buy"], ask: data["sell"], last_price: data["last"], volume: data["vol"].to_i}
-     end
-
-     def update_quoine
-        data = get_json('https://api.quoine.com/products')
-        return {bid: data[2]["market_bid"], ask: data[2]["market_ask"], last_price: data[2]["last_traded_price"], volume: data[2]["volume_24h"].to_i}
-     end
-
-     def update_okcoin_usd
-        data = get_json('https://www.okcoin.com/api/v1/ticker.do?symbol=btc_usd')
-        return {bid: data["ticker"]["buy"].to_i, ask: data["ticker"]["sell"].to_i, last_price: data["ticker"]["last"].to_i, volume: data["ticker"]["vol"].to_i}
-     end
-
-     def update_okcoin_cny
-        data = get_json('https://www.okcoin.cn/api/v1/ticker.do?symbol=btc_cny')
-        return {bid: data["ticker"]["buy"].to_i, ask: data["ticker"]["sell"].to_i, last_price: data["ticker"]["last"].to_i, volume: data["ticker"]["vol"].to_i}
-     end
+            tmp[:bid] = tmp[:bid].to_i
+            tmp[:ask] = tmp[:ask].to_i
+            tmp[:last_price] = tmp[:last_price].to_i
+            tmp[:volume] = tmp[:volume].to_i
+            tmp
+        end
+    end
   end
 end
