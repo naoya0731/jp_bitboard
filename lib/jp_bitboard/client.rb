@@ -32,14 +32,6 @@ module JpBitboard
           end
         end
      end
-
-     def market(name)
-        @markets.each do |mk|
-          if mk.name == name
-            return mk
-          end
-        end
-     end
   end
 
   class Market
