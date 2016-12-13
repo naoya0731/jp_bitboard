@@ -44,7 +44,6 @@ module JpBitboard
                 @data = parse_data(JSON.parse(response.body))
            end
         rescue Exception => e
-           @data = {bid: "N/A", ask: "N/A", last_price: "N/A", volume: "N/A"} 
         end
     end
 
