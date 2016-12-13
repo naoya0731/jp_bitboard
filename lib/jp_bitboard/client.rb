@@ -32,6 +32,14 @@ module JpBitboard
           end
         end
      end
+
+     def average
+        markets = @markets.select{|market| market.currency == "JPY" && market.data[:last_price] > 0}
+        sum = markets.collect{|market| market.data[:last_price]}.inject(:+)
+
+        (sum / markets.count).to_i
+
+     end
   end
 
   class Market
