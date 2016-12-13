@@ -10,26 +10,44 @@ module JpBitboard
      attr_accessor :data, :updated_at, :markets
      def initialize()
         @updated_at = Time.now
-        @markets = [Market.new("bitFlyer", "https://api.bitflyer.jp/v1/ticker", "JPY"),
-                    Market.new("Zaif", "http://api.zaif.jp/api/1/ticker/btc_jpy", "JPY"),
-                    Market.new("Coincheck", "https://coincheck.jp/api/ticker", "JPY"),
-                    Market.new("BtcBox", "https://www.btcbox.co.jp/api/v1/ticker/", "JPY"),
-                    Market.new("Quoine", "https://api.quoine.com/products", "JPY"),
-                    Market.new("OKCoin(USD)", "https://www.okcoin.com/api/v1/ticker.do?symbol=btc_usd", "USD"),
-                    Market.new("OKCoin(CNY)", "https://www.okcoin.com/api/v1/ticker.do?symbol=btc_cny", "CNY")
+        @markets = [Market.new("bitFlyer", "bitflyer", "https://api.bitflyer.jp/v1/ticker", "JPY"),
+                    Market.new("Zaif", "zaif","http://api.zaif.jp/api/1/ticker/btc_jpy", "JPY"),
+                    Market.new("Coincheck", "coincheck","https://coincheck.jp/api/ticker", "JPY"),
+                    Market.new("BtcBox", "btcbox","https://www.btcbox.co.jp/api/v1/ticker/", "JPY"),
+                    Market.new("Quoine", "quoine","https://api.quoine.com/products", "JPY"),
+                    Market.new("OKCoin(USD)", "okcoin_usd","https://www.okcoin.com/api/v1/ticker.do", "USD"),
+                    Market.new("OKCoin(CNY)", "okcoin_cny","https://www.okcoin.cn/api/v1/ticker.do", "CNY"),
+                    Market.new("bitbank", "bitbank","https://bitbanktrade.jp/api/spot_ticker","USD")
                     ]
         #データのfetch
-        @markets.each_with_index do |market,i|
+        @markets.each do |market|
             market.fetch
+        end
+     end
+
+     def method_missing(method, *args)
+        @markets.each do |mk|
+          if mk.code == method.to_s
+            return mk
+          end
+        end
+     end
+
+     def market(name)
+        @markets.each do |mk|
+          if mk.name == name
+            return mk
+          end
         end
      end
   end
 
   class Market
-    attr_accessor :name, :url, :data, :currency
+    attr_accessor :name, :url, :code, :data, :currency
 
-    def initialize(name,url,currency)
+    def initialize(name,code,url,currency)
         @name = name
+        @code = code
         @url = url
         @currency = currency
         @data = {bid: "N/A", ask: "N/A", last_price: "N/A", volume: "N/A"}
@@ -66,12 +84,24 @@ module JpBitboard
                 tmp = {bid: json["ticker"]["buy"], ask: json["ticker"]["sell"], last_price: json["ticker"]["last"], volume: json["ticker"]["vol"]}
             when "OKCoin(CNY)"
                 tmp = {bid: json["ticker"]["buy"], ask: json["ticker"]["sell"], last_price: json["ticker"]["last"], volume: json["ticker"]["vol"]}
+            when "bitbank"
+                tmp = {bid: json["ticker"]["buy"], ask: json["ticker"]["sell"], last_price: json["ticker"]["last"], volume: json["ticker"]["vol"], tts: json["exchange_rate"]["TTS"]}
             end
 
-            tmp[:bid] = tmp[:bid].to_i
-            tmp[:ask] = tmp[:ask].to_i
-            tmp[:last_price] = tmp[:last_price].to_i
-            tmp[:volume] = tmp[:volume].to_i
+            if @currency == "JPY" || @currency == "CNY"
+              tmp[:bid] = tmp[:bid].to_i
+              tmp[:ask] = tmp[:ask].to_i
+              tmp[:last_price] = tmp[:last_price].to_i
+              tmp[:volume] = tmp[:volume].to_i
+              tmp[:tts] = tmp[:tts].to_f
+            elsif @currency == "USD"
+              tmp[:bid] = tmp[:bid].to_f
+              tmp[:ask] = tmp[:ask].to_f
+              tmp[:last_price] = tmp[:last_price].to_f
+              tmp[:volume] = tmp[:volume].to_i
+              tmp[:tts] = tmp[:tts].to_f
+            end
+
             tmp
         end
     end
