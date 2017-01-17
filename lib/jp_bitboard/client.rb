@@ -10,14 +10,14 @@ module JpBitboard
      attr_accessor :data, :updated_at, :markets
      def initialize()
         @updated_at = Time.now
-        @markets = [Market.new("bitFlyer", "bitflyer", "https://api.bitflyer.jp/v1/ticker", "JPY"),
-                    Market.new("Zaif", "zaif","http://api.zaif.jp/api/1/ticker/btc_jpy", "JPY"),
-                    Market.new("Coincheck", "coincheck","https://coincheck.jp/api/ticker", "JPY"),
-                    Market.new("BtcBox", "btcbox","https://www.btcbox.co.jp/api/v1/ticker/", "JPY"),
-                    Market.new("Quoine", "quoine","https://api.quoine.com/products", "JPY"),
-                    Market.new("OKCoin(USD)", "okcoin_usd","https://www.okcoin.com/api/v1/ticker.do", "USD"),
-                    Market.new("OKCoin(CNY)", "okcoin_cny","https://www.okcoin.cn/api/v1/ticker.do", "CNY"),
-                    Market.new("bitbank", "bitbank","https://bitbanktrade.jp/api/spot_ticker","USD")
+        @markets = [Market.new("bitFlyer", "bitflyer", "https://api.bitflyer.jp/v1/ticker", "JPY","https://bitflyer.jp/ja/"),
+                    Market.new("Zaif", "zaif","http://api.zaif.jp/api/1/ticker/btc_jpy", "JPY","https://zaif.jp/"),
+                    Market.new("Coincheck", "coincheck","https://coincheck.jp/api/ticker", "JPY", "https://coincheck.jp"),
+                    Market.new("BtcBox", "btcbox","https://www.btcbox.co.jp/api/v1/ticker/", "JPY","https://www.btcbox.co.jp"),
+                    Market.new("Quoine", "quoine","https://api.quoine.com/products", "JPY","https://www.quoine.com"),
+                    Market.new("OKCoin(USD)", "okcoin_usd","https://www.okcoin.com/api/v1/ticker.do", "USD","https://www.okcoin.com"),
+                    Market.new("OKCoin(CNY)", "okcoin_cny","https://www.okcoin.cn/api/v1/ticker.do", "CNY","https://www.okcoin.cn"),
+                    Market.new("bitbank", "bitbank","https://bitbanktrade.jp/api/spot_ticker","USD","https://bitbanktrade.jp")
                     ]
         #データのfetch
         @markets.each do |market|
@@ -36,20 +36,19 @@ module JpBitboard
      def average
         markets = @markets.select{|market| market.currency == "JPY" && market.data[:last_price] > 0}
         sum = markets.collect{|market| market.data[:last_price]}.inject(:+)
-
         (sum / markets.count).to_i
-
      end
   end
 
   class Market
-    attr_accessor :name, :url, :code, :data, :currency
+    attr_accessor :name, :url, :code, :data, :currency, :web
 
-    def initialize(name,code,url,currency)
+    def initialize(name,code,url,currency,web)
         @name = name
         @code = code
         @url = url
         @currency = currency
+        @web = web
         @data = {bid: "N/A", ask: "N/A", last_price: "N/A", volume: "N/A"}
     end
 
