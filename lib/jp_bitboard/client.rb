@@ -8,17 +8,28 @@ module JpBitboard
 
   class Bitboard
      attr_accessor :data, :updated_at, :markets
-     def initialize()
+     def initialize(target="all")
         @updated_at = Time.now
-        @markets = [Market.new("bitFlyer", "bitflyer", "https://api.bitflyer.jp/v1/ticker", "JPY","https://bitflyer.jp/ja/"),
-                    Market.new("Zaif", "zaif","http://api.zaif.jp/api/1/ticker/btc_jpy", "JPY","https://zaif.jp/"),
-                    Market.new("Coincheck", "coincheck","https://coincheck.jp/api/ticker", "JPY", "https://coincheck.jp"),
-                    Market.new("BtcBox", "btcbox","https://www.btcbox.co.jp/api/v1/ticker/", "JPY","https://www.btcbox.co.jp"),
-                    Market.new("Quoine", "quoine","https://api.quoine.com/products", "JPY","https://www.quoine.com"),
-                    Market.new("OKCoin(USD)", "okcoin_usd","https://www.okcoin.com/api/v1/ticker.do", "USD","https://www.okcoin.com"),
-                    Market.new("OKCoin(CNY)", "okcoin_cny","https://www.okcoin.cn/api/v1/ticker.do", "CNY","https://www.okcoin.cn"),
-                    Market.new("bitbank", "bitbank","https://bitbanktrade.jp/api/spot_ticker","USD","https://bitbanktrade.jp")
-                    ]
+
+        if target == "all"
+          @markets = [Market.new("bitFlyer", "bitflyer", "https://api.bitflyer.jp/v1/ticker", "JPY","https://bitflyer.jp/ja/"),
+                      Market.new("Zaif", "zaif","http://api.zaif.jp/api/1/ticker/btc_jpy", "JPY","https://zaif.jp/"),
+                      Market.new("Coincheck", "coincheck","https://coincheck.jp/api/ticker", "JPY", "https://coincheck.jp"),
+                      Market.new("BtcBox", "btcbox","https://www.btcbox.co.jp/api/v1/ticker/", "JPY","https://www.btcbox.co.jp"),
+                      Market.new("Quoine", "quoine","https://api.quoine.com/products", "JPY","https://www.quoine.com"),
+                      Market.new("OKCoin(USD)", "okcoin_usd","https://www.okcoin.com/api/v1/ticker.do", "USD","https://www.okcoin.com"),
+                      Market.new("OKCoin(CNY)", "okcoin_cny","https://www.okcoin.cn/api/v1/ticker.do", "CNY","https://www.okcoin.cn"),
+                      Market.new("bitbank", "bitbank","https://bitbanktrade.jp/api/spot_ticker","USD","https://bitbanktrade.jp")
+                      ]
+        elsif target == "japan"
+          @markets = [Market.new("bitFlyer", "bitflyer", "https://api.bitflyer.jp/v1/ticker", "JPY","https://bitflyer.jp/ja/"),
+                      Market.new("Zaif", "zaif","http://api.zaif.jp/api/1/ticker/btc_jpy", "JPY","https://zaif.jp/"),
+                      Market.new("Coincheck", "coincheck","https://coincheck.jp/api/ticker", "JPY", "https://coincheck.jp"),
+                      Market.new("BtcBox", "btcbox","https://www.btcbox.co.jp/api/v1/ticker/", "JPY","https://www.btcbox.co.jp"),
+                      Market.new("Quoine", "quoine","https://api.quoine.com/products", "JPY","https://www.quoine.com")
+                      ]
+        end
+                  
         #データのfetch
         @markets.each do |market|
             market.fetch
